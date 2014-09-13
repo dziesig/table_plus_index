@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = TablePlusIndex::VERSION
   spec.authors       = ["Donald R. Ziesig"]
   spec.email         = ["donald@ziesig.org"]
-  spec.summary       = %q{Save Context for table and table-plus}
+  spec.summary       = %q{Save context for table and table-plus}
   spec.description   = <<DOC
 One of my clients has tables with thousands of rows which are related positionally 
 (adjacency is relevant) and have searchable values. Once a row is found it is often 
@@ -35,21 +35,26 @@ Invocation is as follows:
 
 class MyController < ApplicationController
 
-hobo_model_controller
+  hobo_model_controller
 
-auto_actions :all       # may be changed to reflect app needs
+  auto_actions :all       # may be changed to reflect app needs
 
-include TablePlusIndex
+  include TablePlusIndex
 
-def index
-  table_plus_index( self,                     # needs the controller itself
-                    6,                        # the number of records per page (>0)
-                    [:name, :street, :city],  # array of columns to be searched
-                    [:picture],               # array of columns to be ignored (or nil)
-                                              # typically containing large data
-                    :name, :city, :zipcode )  # columns which may be sorted by
-                                              # table-plus.
-  # table_plus_index may be followed by an optional block which is passed to hobo_index
+  def index
+    table_plus_index( self,                     # needs the controller itself
+                      6,                        # the number of records per page (>0)
+                      [:name, :street, :city],  # array of columns to be searched
+                      [:picture],               # array of columns to be ignored (or nil)
+                                                # typically containing large data
+                      :name, :city, :zipcode )  # columns which may be sorted by
+                                                # table-plus.
+    # table_plus_index may be followed by an optional block which is passed to hobo_index
+  end
+
+  *
+  *
+  *
 end
 
 DOC
