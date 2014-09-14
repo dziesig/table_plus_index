@@ -6,9 +6,15 @@ module TablePlusIndex
 #ensure that this is a hobo controller that has an associated model.  Note that methods.include? is
 #used in place of respond_to? because controller.respond_to? :hobo_index is false even though it 
 #does respond to hobo_index    
-    raise "TablePlusAssistant requires a Hobo controller" unless controller.methods.include? :hobo_index
+    raise "TablePlusIndex requires a Hobo controller" unless controller.methods.include? :hobo_index
     model = controller.model
-    raise "TablePlusAssistant requires a controller with an associated model" if model.nil?
+    raise "TablePlusIndex requires a controller with an associated model" if model.nil?
+
+# make sure per_page is > 0
+    if per_page < 1
+      logger.warn "TablePlusIndex per_page < 1 (#{per_page}) defaulting to 6"
+      per_page = 6
+    end
 
 # Save the parameters for next invocation
     save_param(params,:sort,session)
@@ -16,33 +22,20 @@ module TablePlusIndex
 
 # If we have fields to ignore (usually ones with much data),
 # get a list of all columns excluding them.
-    if ignore_columns.nil?
-      field_list = model.column_names
-    else
-      if ignore_columns.is_a? String
-        ign = ignore_columns.split(%r{[,\s*]})
-        ign.each do |col| col.strip! end
-        puts "ignore:  #{ign.inspect}"
-        field_list = model.column_names.select{ |col| ign.find_index(col).nil? }
-      elsif ignore_columns.is_a? Array
-        ign = []
-        ignore_columns.each do |col| ign << col.to_s.strip end
-        field_list = model.column_names.select{ |col| ign.find_index(col).nil? }
-      else
-        raise "ignore_columns must be nil, a String or an Array"
+    field_list = column_list( ignore_columns, model, true)
+    search_cols = column_list( search_columns, model )
+    if search_cols.length < 1
+      unless params[:search].empty?
+        raise "TablePlusIndex search requested on with invalid column.  See log for details"
       end
     end
 
     sort_order = controller.parse_sort_param(*sort_columns) # this feeds back to table-plus arrows
 
-    # finder = model.apply_scopes(  :order_by => sort_order,
-    #                               :search => [params[:search]] + search_columns).select(field_list)
-
     finder = model.unscoped do
       model.apply_scopes( :order_by => sort_order,
-                          :search => [params[:search]] + search_columns).select(field_list)
+                          :search => [params[:search]] + search_cols).select(field_list)
     end
-
 
 # pass the block to the hobo_index if necessary
     if block_given?
@@ -58,6 +51,37 @@ module TablePlusIndex
   end
 
 private
+
+  def column_list( columns, model, ign = false )
+    if columns.nil?
+      if ign 
+        result = []
+      else
+        result = model.column_names
+      end
+    else
+      cols = []
+      if columns.is_a? String
+        cols = columns.split(%r{[,\s*]})
+        cols.each do |col| col.strip! end
+        result = model.column_names.select{ |col| cols.find_index(col).nil? ^ !ign }
+      elsif columns.is_a? Array
+        cols = []
+        columns.each do |col| cols << col.to_s.strip end
+        result = model.column_names.select{ |col| cols.find_index(col).nil? ^ !ign }
+      else
+        raise "columns must be nil, a String or an Array"
+      end
+      if Rails.env.development?
+        cols.each do |col| 
+          if (not col.empty?) and model.column_names.find_index(col).nil?
+            logger.debug "TablePlusIndex:  table #{model.name} does not have a column named #{col}"
+          end
+        end
+      end
+    end
+    result
+  end
 
   def save_page(params, per_page, session, table)
 # Default to the first page.

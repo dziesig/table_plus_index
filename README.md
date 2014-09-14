@@ -28,7 +28,7 @@ the call to hobo_index within the index method.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'table_plus_index'
+gem 'table_plus_index', :git => 'https://github.com/dziesig/table_plus_index.git'
 ```
 
 And then execute:
@@ -37,34 +37,34 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install table_plus_index
+    $ gem install table_plus_index, :git => 'https://github.com/dziesig/table_plus_index.git'
 
 ## Usage
 
-class MyController < ApplicationController
+	class MyController < ApplicationController
 
-hobo_model_controller
+	  hobo_model_controller
 
-	auto_actions :all       # may be changed to reflect app needs
+		auto_actions :all       # may be changed to reflect app needs
 
-	include TablePlusIndex
+		include TablePlusIndex
 
-	def index
-	  table_plus_index( self,                     # needs the controller itself
-	                    6,                        # the number of records per page (>0)
-	                    search_columns,  					# columns to be searched
-	                    ignore_column,            # columns to be ignored (or nil)
-	                    :name, :city, :zipcode )  # columns which may be sorted by
-	                                              # table-plus.
+		def index
+		  table_plus_index( self,                     # needs the controller itself
+		                    6,                        # the number of records per page (>0)
+		                    search_columns,  					# columns to be searched
+		                    ignore_column,            # columns to be ignored (or nil)
+		                    :name, :city, :zipcode )  # columns which may be sorted by
+		                                              # table-plus.
 
-	  # table_plus_index may be followed by an optional block which is passed to hobo_index
+		  # table_plus_index may be followed by an optional block which is passed to hobo_index
 
+		end
+
+		*
+		*
+		*
 	end
-
-	*
-	*
-	*
-end
 
 "search_columns" contains the names of one or more columns which will be searched
 from the table_plus search box. This may take the form of a string, an array of
@@ -72,6 +72,10 @@ strings or an array of symbols:
 
 'name', 'name, rank, serial_number', ['name', 'rank', 'serial_number'],
 [:name, :rank, :serial_number] or [:name, 'rank', 'serial_number']
+
+NOTE:  	Due to a bug in the underlying system (at least when using postgresql),
+				do not specify a numeric column as one of the search column or any
+				non-blank search will raise an exception.
 
 "ignore_columns" contains the names of zero or more columns which will removed
 from the results.  Typically this is only needed if there are columns with large
@@ -90,3 +94,9 @@ a string, an array of strings, an array of symbols, or nil:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+I have tested this gem extensively using a local test application (the original
+code has been in use since 2011).  I have attempted to incorporate tests in the
+gem itself, but the test requires me to include almost the entire test application
+in the gem, increasing its size by hundreds of times and still giving me circular
+dependencies.  I would appreciate any help in putting reasonable tests in the gem.
