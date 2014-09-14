@@ -66,7 +66,7 @@ Or install it yourself as:
 		*
 	end
 
-"search_columns" contains the names of one or more columns which will be searched
+"search_columns" contains the names of *one* or more columns which will be searched
 from the table_plus search box. This may take the form of a string, an array of
 strings or an array of symbols:
 
@@ -74,10 +74,10 @@ strings or an array of symbols:
 [:name, :rank, :serial_number] or [:name, 'rank', 'serial_number']
 
 NOTE:  	Due to a bug in the underlying system (at least when using postgresql),
-				do not specify a numeric column as one of the search column or any
+				do not specify a numeric column as one of the search columns or any
 				non-blank search will raise an exception.
 
-"ignore_columns" contains the names of zero or more columns which will removed
+"ignore_columns" contains the names of zero or more columns which will be removed
 from the results.  Typically this is only needed if there are columns with large
 amounts of data which are not needed by the index page. This may take the form of 
 a string, an array of strings, an array of symbols, or nil:
