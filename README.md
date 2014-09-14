@@ -41,6 +41,9 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
+
+
 	class MyController < ApplicationController
 
 	  hobo_model_controller
@@ -65,8 +68,9 @@ Or install it yourself as:
 		*
 		*
 	end
+```
 
-"search_columns" contains the names of *one* or more columns which will be searched
+"search_columns" contains the names of **one** or more columns which will be searched
 from the table_plus search box. This may take the form of a string, an array of
 strings or an array of symbols:
 
