@@ -46,25 +46,26 @@ class MyController < ApplicationController
 
   hobo_model_controller
 
-	auto_actions :all       # may be changed to reflect app needs
+  auto_actions :all       # may be changed to reflect app needs
 
-	include TablePlusIndex
+  include TablePlusIndex
 
-	def index
-	  table_plus_index( self,                     # needs the controller itself
-	                    6,                        # the number of records per page (>0)
-	                    search_columns,  					# columns to be searched
-	                    ignore_column,            # columns to be ignored (or nil)
-	                    :name, :city, :zipcode )  # columns which may be sorted by
-	                                              # table-plus.
+  def index
+    table_plus_index( self,                     # needs the controller itself
+                      6,                        # the number of records per page (>0)
+                      search_columns,           # columns to be searched
+                      ignore_column,            # columns to be ignored (or nil)
+                      :name, :city, :zipcode )  # columns which may be sorted by
+                                                # table-plus.
 
-	  # table_plus_index may be followed by an optional block which is passed to hobo_index
+    # table_plus_index may be followed by an optional block 
+    # which is passed to hobo_index
 
-	end
+  end
 
-	*
-	*
-	*
+  *
+  *
+  *
 end
 ```
 
@@ -75,9 +76,9 @@ strings or an array of symbols:
 'name', 'name, rank, serial_number', ['name', 'rank', 'serial_number'],
 [:name, :rank, :serial_number] or [:name, 'rank', 'serial_number']
 
-NOTE:  	Due to a bug in the underlying system (at least when using postgresql),
-				do not specify a numeric column as one of the search columns or any
-				non-blank search will raise an exception.
+NOTE:   Due to a bug in the underlying system (at least when using postgresql),
+        do not specify a numeric column as one of the search columns or any
+        non-blank search will raise an exception.
 
 "ignore_columns" contains the names of zero or more columns which will be removed
 from the results.  Typically this is only needed if there are columns with large
