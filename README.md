@@ -42,32 +42,30 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
+class MyController < ApplicationController
 
+  hobo_model_controller
 
-	class MyController < ApplicationController
+	auto_actions :all       # may be changed to reflect app needs
 
-	  hobo_model_controller
+	include TablePlusIndex
 
-		auto_actions :all       # may be changed to reflect app needs
+	def index
+	  table_plus_index( self,                     # needs the controller itself
+	                    6,                        # the number of records per page (>0)
+	                    search_columns,  					# columns to be searched
+	                    ignore_column,            # columns to be ignored (or nil)
+	                    :name, :city, :zipcode )  # columns which may be sorted by
+	                                              # table-plus.
 
-		include TablePlusIndex
+	  # table_plus_index may be followed by an optional block which is passed to hobo_index
 
-		def index
-		  table_plus_index( self,                     # needs the controller itself
-		                    6,                        # the number of records per page (>0)
-		                    search_columns,  					# columns to be searched
-		                    ignore_column,            # columns to be ignored (or nil)
-		                    :name, :city, :zipcode )  # columns which may be sorted by
-		                                              # table-plus.
-
-		  # table_plus_index may be followed by an optional block which is passed to hobo_index
-
-		end
-
-		*
-		*
-		*
 	end
+
+	*
+	*
+	*
+end
 ```
 
 "search_columns" contains the names of **one** or more columns which will be searched
