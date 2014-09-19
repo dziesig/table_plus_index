@@ -17,7 +17,7 @@ module TablePlusIndex
     end
 
 # Save the parameters for next invocation
-    save_param(params,:sort,session)
+    save_param(params,:sort,session,*sort_columns)
     save_param(params,:search,session)
 
 # If we have fields to ignore (usually ones with much data),
@@ -112,15 +112,20 @@ private
     return page
   end
 
-  def save_param(params,param,session)
+  def save_param(params,param,session,*sort_cols)
     controller = params[:controller]
     key = controller + '-' + param.to_s
     if params[param]
 # If we have a value in params[param], save it in the session
       value = params[param]
       session[key] = value
+    elsif session[key].is_a? String
+      value = session[key]
     else
-      value = session[key] if session[key].is_a? String
+      if sort_cols.length > 0 
+         value = sort_cols[0].to_s
+        session[key] = value
+      end
     end
 # set params[param] if we have a value.
     params[param] = value if value
