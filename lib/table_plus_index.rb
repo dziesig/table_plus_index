@@ -25,7 +25,7 @@ module TablePlusIndex
     field_list = column_list( ignore_columns, model, true)
     search_cols = column_list( search_columns, model )
     if search_cols.length < 1
-      unless params[:search].empty?
+      unless params[:search].blank?
         raise "TablePlusIndex search requested on with invalid column.  See log for details"
       end
     end
