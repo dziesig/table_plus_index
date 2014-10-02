@@ -15,9 +15,19 @@ module TablePlusIndex
       logger.warn "TablePlusIndex per_page < 1 (#{per_page}) defaulting to 6"
       per_page = 6
     end
+# Fix the sord parameter if it contains something not in the sort_columns.
+# This eliminates the unexpected re-ordering if the header for a non-sort
+# column is clicked.
+
+    sort_col = params[:sort].to_s
+    sort_col = sort_col[0] == '-' ? sort_col[1..-1] : sort_col
+    sort_col = sort_col.to_sym
+    unless sort_columns.include? sort_col
+      params[:sort] = nil
+    end
 
 # Save the parameters for next invocation
-    save_param(params,:sort,session,*sort_columns)
+    save_param(params,:sort,session)
     save_param(params,:search,session)
 
 # If we have fields to ignore (usually ones with much data),
@@ -33,8 +43,8 @@ module TablePlusIndex
     sort_order = controller.parse_sort_param(*sort_columns) # this feeds back to table-plus arrows
 
     finder = model.unscoped do
-      model.apply_scopes( :order_by => sort_order,
-                          :search => [params[:search]] + search_cols).select(field_list)
+      model.apply_scopes( :search => [params[:search]] + search_cols).
+            apply_scopes( :order_by => sort_order ).select(field_list)
     end
 
 # pass the block to the hobo_index if necessary
@@ -112,7 +122,7 @@ private
     return page
   end
 
-  def save_param(params,param,session,*sort_cols)
+  def save_param(params,param,session)
     controller = params[:controller]
     key = controller + '-' + param.to_s
     if params[param]
@@ -122,14 +132,15 @@ private
     elsif session[key].is_a? String
       value = session[key]
     else
-      if sort_cols.length > 0 
-         value = sort_cols[0].to_s
-        session[key] = value
-      end
+      value = nil
+      # if sort_cols.length > 0 
+      #    value = sort_cols[0].to_s
+      #   session[key] = value
+      # end
     end
 # set params[param] if we have a value.
     params[param] = value if value
-    params[param]    
+    # params[param]    # Don't need return value.
   end
 
 end
